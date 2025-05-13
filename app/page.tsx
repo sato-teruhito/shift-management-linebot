@@ -1,20 +1,22 @@
 "use client";
 
-import dayjs from "dayjs";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import { supabase } from '@/lib/supabase';
 
-const daysOfWeek = ['月', '火', '水', '木', '金', '土', '日'];
-
+type User = { id: string; name: string };
 type ShiftChoice = '〇' | '×' | '';
 
 export default function ShiftForm() {
-  const [names] = useState(['田中', '佐藤', '鈴木']);
-  //const [names, setNames] = useState(['田中', '佐藤', '鈴木']);
-  const [selectedName, setSelectedName] = useState('');
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState('');
   const [weekDates, setWeekDates] = useState<string[]>([]);
   const [shifts, setShifts] = useState<ShiftChoice[]>(Array(7).fill(''));
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    fetchUsers();
+
     const today = dayjs();
     const nextMonday = today.day() === 0 ? today.add(1, 'day') : today.day(8);
     const dates = Array.from({ length: 7 }, (_, i) =>
@@ -23,12 +25,58 @@ export default function ShiftForm() {
     setWeekDates(dates);
   }, []);
 
+  const fetchUsers = async () => {
+    const { data, error } = await supabase.from('users').select('*');
+    if (error) {
+      console.error('ユーザー取得失敗:', error.message);
+    } else {
+      setUsers(data);
+    }
+  };
+
   const handleSelect = (index: number, choice: ShiftChoice) => {
-    setShifts(prev => {
+    setShifts((prev) => {
       const updated = [...prev];
       updated[index] = prev[index] === choice ? '' : choice;
       return updated;
     });
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedUserId) {
+      alert('名前を選択してください');
+      return;
+    }
+
+    setLoading(true);
+
+    const today = dayjs();
+    const nextMonday = today.day() === 0 ? today.add(1, 'day') : today.day(8);
+    const weekStart = nextMonday.format('YYYY-MM-DD');
+
+    const shiftData = {
+      user_id: selectedUserId,
+      week_start: weekStart,
+      mon: shifts[0],
+      tue: shifts[1],
+      wed: shifts[2],
+      thu: shifts[3],
+      fri: shifts[4],
+      sat: shifts[5],
+      sun: shifts[6],
+    };
+
+    const { error } = await supabase.from('shifts').insert([shiftData]);
+
+    setLoading(false);
+
+    if (error) {
+      console.error('送信失敗:', error.message);
+      alert('シフトの送信に失敗しました');
+    } else {
+      alert('シフトを送信しました');
+      setShifts(Array(7).fill(''));
+    }
   };
 
   return (
@@ -40,12 +88,14 @@ export default function ShiftForm() {
         <label className="block text-sm mb-2">名前を選択してください</label>
         <select
           className="border p-2 rounded w-48"
-          value={selectedName}
-          onChange={(e) => setSelectedName(e.target.value)}
+          value={selectedUserId}
+          onChange={(e) => setSelectedUserId(e.target.value)}
         >
           <option value="">-- 選択 --</option>
-          {names.map(name => (
-            <option key={name} value={name}>{name}</option>
+          {users.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.name}
+            </option>
           ))}
         </select>
       </div>
@@ -54,9 +104,11 @@ export default function ShiftForm() {
       <table className="table-auto mx-auto border">
         <thead>
           <tr>
-            {daysOfWeek.map((day, i) => (
+            {['月', '火', '水', '木', '金', '土', '日'].map((day, i) => (
               <th key={i} className="border px-4 py-2">
-                {day}<br />{weekDates[i]}
+                {day}
+                <br />
+                {weekDates[i]}
               </th>
             ))}
           </tr>
@@ -66,7 +118,9 @@ export default function ShiftForm() {
             {shifts.map((choice, i) => (
               <td key={i} className="border p-2">
                 <button
-                  className={`px-2 py-1 w-10 rounded ${choice === '〇' ? 'bg-green-300' : 'bg-gray-100'}`}
+                  className={`px-2 py-1 w-10 rounded ${
+                    choice === '〇' ? 'bg-green-300' : 'bg-gray-100'
+                  }`}
                   onClick={() => handleSelect(i, '〇')}
                 >
                   〇
@@ -78,7 +132,9 @@ export default function ShiftForm() {
             {shifts.map((choice, i) => (
               <td key={i} className="border p-2">
                 <button
-                  className={`px-2 py-1 w-10 rounded ${choice === '×' ? 'bg-red-300' : 'bg-gray-100'}`}
+                  className={`px-2 py-1 w-10 rounded ${
+                    choice === '×' ? 'bg-red-300' : 'bg-gray-100'
+                  }`}
                   onClick={() => handleSelect(i, '×')}
                 >
                   ×
@@ -89,13 +145,16 @@ export default function ShiftForm() {
         </tbody>
       </table>
 
-      {/* 送信ボタン（未実装） */}
+      {/* 送信ボタン */}
       <div className="mt-6">
-        <button className="bg-blue-500 text-white px-4 py-2 rounded" disabled>
-          送信（未実装）
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? '送信中...' : '送信'}
         </button>
       </div>
-
     </div>
   );
 }
