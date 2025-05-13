@@ -8,7 +8,8 @@ const daysOfWeek = ['月', '火', '水', '木', '金', '土', '日'];
 type ShiftChoice = '〇' | '×' | '';
 
 export default function ShiftForm() {
-  const [names, setNames] = useState(['田中', '佐藤', '鈴木']);
+  const [names] = useState(['田中', '佐藤', '鈴木']);
+  //const [names, setNames] = useState(['田中', '佐藤', '鈴木']);
   const [selectedName, setSelectedName] = useState('');
   const [weekDates, setWeekDates] = useState<string[]>([]);
   const [shifts, setShifts] = useState<ShiftChoice[]>(Array(7).fill(''));
