@@ -80,7 +80,7 @@ export default function ShiftForm() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 text-center">
+    <div className="max-w-full mx-auto p-4 text-center">
       <h1 className="text-xl font-bold mb-4">シフト提出フォーム</h1>
 
       {/* 名前選択 */}
@@ -101,49 +101,51 @@ export default function ShiftForm() {
       </div>
 
       {/* シフト入力表 */}
-      <table className="table-auto mx-auto border">
-        <thead>
-          <tr>
-            {['月', '火', '水', '木', '金', '土', '日'].map((day, i) => (
-              <th key={i} className="border px-4 py-2">
-                {day}
-                <br />
-                {weekDates[i]}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            {shifts.map((choice, i) => (
-              <td key={i} className="border p-2">
-                <button
-                  className={`px-2 py-1 w-10 rounded ${
-                    choice === '〇' ? 'bg-green-300' : 'bg-gray-100'
-                  }`}
-                  onClick={() => handleSelect(i, '〇')}
-                >
-                  〇
-                </button>
-              </td>
-            ))}
-          </tr>
-          <tr>
-            {shifts.map((choice, i) => (
-              <td key={i} className="border p-2">
-                <button
-                  className={`px-2 py-1 w-10 rounded ${
-                    choice === '×' ? 'bg-red-300' : 'bg-gray-100'
-                  }`}
-                  onClick={() => handleSelect(i, '×')}
-                >
-                  ×
-                </button>
-              </td>
-            ))}
-          </tr>
-        </tbody>
-      </table>
+      <div className="overflow-x-auto">
+        <table className="table-auto min-w-full border">
+          <thead>
+            <tr>
+              {['月', '火', '水', '木', '金', '土', '日'].map((day, i) => (
+                <th key={i} className="border px-4 py-2 text-sm">
+                  {day}
+                  <br />
+                  {weekDates[i]}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {shifts.map((choice, i) => (
+                <td key={i} className="border p-2">
+                  <button
+                    className={`px-2 py-1 w-10 rounded ${
+                      choice === '〇' ? 'bg-green-300' : 'bg-gray-100'
+                    }`}
+                    onClick={() => handleSelect(i, '〇')}
+                  >
+                    〇
+                  </button>
+                </td>
+              ))}
+            </tr>
+            <tr>
+              {shifts.map((choice, i) => (
+                <td key={i} className="border p-2">
+                  <button
+                    className={`px-2 py-1 w-10 rounded ${
+                      choice === '×' ? 'bg-red-300' : 'bg-gray-100'
+                    }`}
+                    onClick={() => handleSelect(i, '×')}
+                  >
+                    ×
+                  </button>
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       {/* 送信ボタン */}
       <div className="mt-6">
