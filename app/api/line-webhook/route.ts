@@ -3,7 +3,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Client, WebhookEvent } from '@line/bot-sdk';
 import { supabase } from '@/lib/supabase';
-import { Console } from 'console';
 
 const client = new Client({
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN!,
@@ -20,7 +19,7 @@ export async function POST(req: NextRequest) {
         if (event.type === 'message' && event.message.type === 'text') {
           const userMessage = event.message.text;
           const messageText = userMessage.trim();
-          const userId = event.source.userId;
+          //const userId = event.source.userId;
 
           if (userMessage.startsWith('@シフト提出')) {
             await client.replyMessage(event.replyToken, {
@@ -41,7 +40,7 @@ export async function POST(req: NextRequest) {
                 if ( error ) {
                     console.error('supabaseへの登録エラー：', error.message);
                 } else {
-                    //console.log(`ユーザ名「${name}」を登録しました`)；；
+                    console.log(`ユーザ名「${name}」を登録しました`);
                 }
             }
 
