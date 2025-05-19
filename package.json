@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@line/bot-sdk": "^9.9.0",
     "@supabase/supabase-js": "^2.49.4",
     "dayjs": "^1.11.13",
     "lucide-react": "^0.510.0",
