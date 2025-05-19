@@ -34,14 +34,17 @@ export async function POST(req: NextRequest) {
             const name = messageText.replace('@登録', '').trim();
 
             if (name) {
-                //supabaseに名前登録
-                const { error } = await supabase.from('users').insert([{ name }]);
+              //supabaseに名前登録
+              const { error } = await supabase.from('users').insert([{ name }]);
 
-                if ( error ) {
-                    console.error('supabaseへの登録エラー：', error.message);
-                } else {
-                    console.log(`ユーザ名「${name}」を登録しました`);
-                }
+              if (error) {
+                console.error('supabaseへの登録エラー：', error.message);
+              } else {
+                await client.replyMessage(event.replyToken, {
+                  type: 'text',
+                  text: `ユーザー名「${name}」を登録しました`,
+                });
+              }
             }
 
           }
